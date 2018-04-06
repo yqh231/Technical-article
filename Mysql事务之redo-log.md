@@ -3,7 +3,7 @@ title: MySQL之redo log
 date: 2018-04-02 10:24:54
 tags: 数据库
 ---
-
+![mysql](http://opxvbng4q.bkt.clouddn.com/mysql.png)
 ## Redo log是什么?
 MySQL数据库作为现在互联网公司内最流行的关系型数据库，相信大家都有工作中使用过。InnoDB是MySQL里最为常用的一种存储引擎，主要面向在线事务处理(OLTP)的应用。今天就让我们来探究一下InnoDB是如何一步一步实现事务的，这次我们先讲事务实现的redo log。
 
@@ -13,7 +13,7 @@ MySQL数据库作为现在互联网公司内最流行的关系型数据库，相
 ## Redo log工作原理
 在讲Redo log工作原理之前，先来学习一下MySQL的一些基础：
 
-**一、日志类型**
+1. 日志类型
 ```mermaid
 graph LR
     A[MySQL日志类型]
@@ -22,11 +22,11 @@ graph LR
 ```
 redo log在数据库重启恢复的时候被使用，因为其属于物理日志的特性，恢复速度远快于逻辑日志。而我们经常使用的binlog就属于典型的逻辑日志。
 
-**二、checkpoint**
+2. checkpoint
 
 坦白来讲checkpoint本身是比较复杂的，checkpoint所做的事就是把脏页给刷新回磁盘。所以，当DB重启恢复时，只需要恢复checkpoint之后的数据。这样就能大大缩短恢复时间。当然checkpoint还有其他的作用。
 
-**三、LSN(Log Sequence Number)**
+3. LSN(Log Sequence Number)
 
 LSN实际上就是InnoDB使用的一个版本标记的计数，它是一个单调递增的值。数据页和redo log都有各自的LSN。我们可以根据数据页中的LSN值和redo log中LSN的值判断需要恢复的redo log的位置和大小。
 
@@ -45,4 +45,3 @@ graph LR
 这里说明一下，`innodb_flush_log_at_trx_commit`设为非0的值，并不是说不会在master thread中刷新日志了。master thread刷新日志是在不断进行的，所以redo log写入磁盘是在持续的写入。
 
 DB宕机后重启，InnoDB会首先去查看数据页中的LSN的数值。这个值代表数据页被刷新回磁盘的LSN的大小。然后再去查看redo logLSN的大小。如果数据页中的LSN值大说明数据页领先于redo log刷新回磁盘，不需要进行恢复。反之需要从redo log中恢复数据。
-
