@@ -13,7 +13,7 @@ MySQL数据库作为现在互联网公司内最流行的关系型数据库，相
 ## Redo log工作原理
 在讲Redo log工作原理之前，先来学习一下MySQL的一些基础：
 
-1. 日志类型
+**一、日志类型**
 ```mermaid
 graph LR
     A[MySQL日志类型]
@@ -22,11 +22,11 @@ graph LR
 ```
 redo log在数据库重启恢复的时候被使用，因为其属于物理日志的特性，恢复速度远快于逻辑日志。而我们经常使用的binlog就属于典型的逻辑日志。
 
-2. checkpoint
+**二、checkpoint**
 
 坦白来讲checkpoint本身是比较复杂的，checkpoint所做的事就是把脏页给刷新回磁盘。所以，当DB重启恢复时，只需要恢复checkpoint之后的数据。这样就能大大缩短恢复时间。当然checkpoint还有其他的作用。
 
-3. LSN(Log Sequence Number)
+**三、LSN(Log Sequence Number)**
 
 LSN实际上就是InnoDB使用的一个版本标记的计数，它是一个单调递增的值。数据页和redo log都有各自的LSN。我们可以根据数据页中的LSN值和redo log中LSN的值判断需要恢复的redo log的位置和大小。
 
