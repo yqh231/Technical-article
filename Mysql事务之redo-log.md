@@ -14,12 +14,12 @@ MySQL数据库作为现在互联网公司内最流行的关系型数据库，相
 在讲Redo log工作原理之前，先来学习一下MySQL的一些基础：
 
 **一、日志类型**
-{% mermaid %}
+```mermaid
 graph LR
     A[MySQL日志类型]
     A-->B["物理日志(存储了数据被修改的值)"]
     A-->C["逻辑日志(存储了逻辑SQL修改语句)"]
-{% endmermaid %}
+```
 redo log在数据库重启恢复的时候被使用，因为其属于物理日志的特性，恢复速度远快于逻辑日志。而我们经常使用的binlog就属于典型的逻辑日志。
 
 **二、 checkpoint**
@@ -35,13 +35,13 @@ LSN实际上就是InnoDB使用的一个版本标记的计数，它是一个单�
 好的，现在我们来看看redo log的工作原理。说白了，redo log就是存储了数据被修改后的值。当我们提交一个事务时，InnoDB会先去把要修改的数据写入日志，然后再去修改缓冲池里面的真正数据页。
 
 我们着重看看redo log是怎么一步步写入磁盘的。redo log本身也由两部分所构成即重做日志缓冲(redo log buffer)和重做日志文件(redo log file)。这样的设计同样也是为了调和内存与磁盘的速度差异。InnoDB写入磁盘的策略可以通过`innodb_flush_log_at_trx_commit`这个参数来控制。
-{% mermaid %}
+```mermaid
 graph LR
     A["innodb_flush_log_at_trx_commit"]
     A-->B["该值为1时表示事务提交必须调用一次fsync参数"]
     A-->C["该值为0时表示事务提交不写入磁盘，写入过程在master thread中进行"]
     A-->D["该值为2表示事务提交时不写入重做日志文件，而是写入文件系统缓冲中"]
-{% endmermaid %}
+```
 当该值为1时，当然是最安全的，但是数据库性能会受一定影响。
 
 为0时性能较好，但是会丢失掉master thread还没刷新进磁盘部分的数据。
