@@ -101,5 +101,5 @@ session.commit()
 key为表上的一个二级索引，当手动加锁的时候，锁的性质变为NEXT-KEY Lock。不仅锁住`key`值，同时也锁住间隙。session 1锁住了相应的间隙，session 2也锁住了相应的间隙。如果这个时候session 1锁住的间隙，正好是session 2要插入的值。session 2锁住的间隙，是session 1要插入的值。就会出现死锁。
 
 解决问题的办法很简单，有两种策略：
-1、 使用Unique key或主键作为筛选条件，是next-key lock退化为recode lock。
+1、 使用Unique key或主键作为筛选条件，从next-key lock退化为recode lock。
 2、 事务的隔离级别从RR退回到RC，或者手动设置参数关闭gap lock。这种更改最为简单，但可能出现幻读，所以需要确定幻读不会影响业务的正常运行。
